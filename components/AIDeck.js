@@ -7,11 +7,10 @@ import { useEffect, useRef, useState } from "react";
 /* eslint-disable @next/next/no-img-element */
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, Loader2, ScanLine, Terminal } from "lucide-react";
-import { DEMO_DIAGNOSIS } from "@/lib/demoStore";
 
 const SCAN_TIMEOUT_MS = 45000;
 
-export default function AIDeck({ controls, requestCapture, scan, online, demo = false }) {
+export default function AIDeck({ controls, requestCapture, scan, online }) {
   const [scanning, setScanning] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [messages, setMessages] = useState([
@@ -51,19 +50,6 @@ export default function AIDeck({ controls, requestCapture, scan, online, demo = 
     const analyze = async () => {
       setAnalyzing(true);
       pushMsg("system", "> foliage scan received. uploading to Plant.id …");
-
-      // Demo scans: canned Verde AI diagnosis, no API keys required
-      if (demo || scan.demo) {
-        await new Promise((r) => setTimeout(r, 1800)); // simulated latency
-        pushMsg(
-          "system",
-          `> IDENTIFIED: ${DEMO_DIAGNOSIS.plant_identified} · DIAGNOSIS: ${DEMO_DIAGNOSIS.health_diagnosis}`
-        );
-        pushMsg("ai", DEMO_DIAGNOSIS.gemini_remedy);
-        setAnalyzing(false);
-        return;
-      }
-
       try {
         const res = await fetch("/api/analyze-plant", {
           method: "POST",

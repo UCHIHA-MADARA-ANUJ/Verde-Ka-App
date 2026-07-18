@@ -11,10 +11,10 @@ export default function StatusBadge({ sessionStatus, online, hasData }) {
     cls = "border-yellow-500/50 text-yellow-400";
     Icon = Loader2;
     spin = true;
-  } else if (sessionStatus === "demo") {
-    label = "DEMO MODE · SIMULATED EDGE";
-    cls = "border-purple-500/60 text-purple-400";
-    Icon = Wifi;
+  } else if (sessionStatus === "unconfigured") {
+    label = "CONFIG MISSING";
+    cls = "border-amber-500/60 text-amber-400";
+    Icon = WifiOff;
   } else if (sessionStatus === "error") {
     label = "AUTH FAILED — RETRY";
     cls = "border-verde-danger text-verde-danger animate-pulse-red";

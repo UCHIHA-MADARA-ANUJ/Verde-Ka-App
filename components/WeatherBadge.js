@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { onValue } from "firebase/database";
 import { verdeRef } from "@/lib/firebase";
-import { demoSubscribe } from "@/lib/demoStore";
 import { CloudRain, Sun, Cloud, CloudLightning } from "lucide-react";
 
 function iconFor(condition) {
@@ -14,14 +13,10 @@ function iconFor(condition) {
   return Sun;
 }
 
-export default function WeatherBadge({ enabled, demo = false, weatherOverride }) {
+export default function WeatherBadge({ enabled, weatherOverride }) {
   const [weather, setWeather] = useState(null);
 
   useEffect(() => {
-    if (demo) {
-      const unsub = demoSubscribe((snap) => setWeather(snap.weather));
-      return unsub;
-    }
     if (!enabled) return;
     const weatherRef = verdeRef("/weather");
     if (!weatherRef) return;
@@ -31,7 +26,7 @@ export default function WeatherBadge({ enabled, demo = false, weatherOverride })
       () => {}
     );
     return () => unsub();
-  }, [enabled, demo]);
+  }, [enabled]);
 
   const condition = weather?.condition || "—";
   const Icon = iconFor(condition);
