@@ -68,6 +68,14 @@ function summarizeDiagnosis(json) {
   return { plantName, diseaseText };
 }
 
+// Model fallback chain — live-tested against this key on 2026-07-18:
+// gemini-2.5-flash ✅ · flash-lite ✅ · flash-latest ✅ (2.0-flash was 429)
+const GEMINI_MODELS = [
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-lite",
+  "gemini-flash-latest",
+];
+
 async function remedyWithGemini({ plantName, diseaseText }) {
   const prompt =
     `You are Verde AI, a botanical specialist embedded in a smart-garden ` +
@@ -77,26 +85,36 @@ async function remedyWithGemini({ plantName, diseaseText }) {
     `160 words. Prefer neem-oil, watering-schedule and light adjustments. ` +
     `Format as short numbered steps suitable for a monospace terminal.`;
 
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.6, maxOutputTokens: 512 },
-      }),
+  let lastErr = null;
+  for (const model of GEMINI_MODELS) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.6, maxOutputTokens: 512 },
+          }),
+        }
+      );
+      if (!res.ok) {
+        const text = await res.text();
+        lastErr = new Error(
+          `Gemini ${model} error ${res.status}: ${text.slice(0, 150)}`
+        );
+        continue; // quota/availability issue → try next model
+      }
+      const json = await res.json();
+      const out = json?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      if (out) return out;
+      lastErr = new Error(`Gemini ${model} returned empty response`);
+    } catch (err) {
+      lastErr = err;
     }
-  );
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Gemini error ${res.status}: ${text.slice(0, 200)}`);
   }
-  const json = await res.json();
-  return (
-    json?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
-    "Diagnosis complete. Maintain the current care routine and re-scan in 3 days."
-  );
+  throw lastErr || new Error("All Gemini models failed");
 }
 
 export async function POST(request) {
