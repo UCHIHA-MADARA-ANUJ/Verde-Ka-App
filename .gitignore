@@ -8,3 +8,4 @@ build/
 .vercel
 npm-debug.log*
 *.tsbuildinfo
+VERCEL_ENV_PASTE.txt

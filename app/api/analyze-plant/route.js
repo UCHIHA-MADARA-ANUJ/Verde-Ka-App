@@ -1,9 +1,10 @@
 // ============================================================
 // POST /api/analyze-plant  (Edge runtime — low latency)
-// 1. Receives { imageUrl } OR { imageDataUrl } (base64 Plan B mode).
-// 2. Calls Plant.id to identify species + disease probabilities.
-// 3. Feeds the structured diagnosis into Gemini 2.0 Flash for a
-//    friendly, step-by-step organic treatment plan.
+// 1. Receives { imageUrl } OR { imageDataUrl } (base64 RTDB mode).
+// 2. Calls Kindwise crop.health API to identify the crop and
+//    score disease probabilities (works with CROP_HEALTH_API_KEY).
+// 3. Feeds the diagnosis into Gemini 2.0 Flash for a friendly,
+//    step-by-step organic treatment plan.
 // 4. Returns { plant_identified, health_diagnosis, gemini_remedy }.
 // ============================================================
 import { NextResponse } from "next/server";
@@ -15,7 +16,6 @@ async function fetchImageAsBase64(imageUrl) {
   const res = await fetch(imageUrl);
   if (!res.ok) throw new Error(`Image fetch failed (${res.status})`);
   const buf = await res.arrayBuffer();
-  // Chunked base64 conversion (Edge-safe, avoids call stack overflow)
   const bytes = new Uint8Array(buf);
   let binary = "";
   const CHUNK = 0x8000;
@@ -25,46 +25,47 @@ async function fetchImageAsBase64(imageUrl) {
   return btoa(binary);
 }
 
-async function identifyWithPlantId(base64Image) {
-  const res = await fetch("https://api.plant.id/v2/identify", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Api-Key": process.env.PLANT_ID_API_KEY,
-    },
-    body: JSON.stringify({
-      images: [base64Image],
-      modifiers: ["crops_fast", "similar_images"],
-      plant_details: ["common_names", "url", "wiki_description"],
-      disease_details: ["description", "treatment"],
-    }),
-  });
+// ---- Kindwise crop.health identification ----
+async function identifyWithCropHealth(base64Image) {
+  const apiKey =
+    process.env.CROP_HEALTH_API_KEY || process.env.PLANT_ID_API_KEY;
+  const res = await fetch(
+    "https://crop.kindwise.com/api/v1/identification",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Api-Key": apiKey,
+      },
+      body: JSON.stringify({
+        images: [`data:image/jpeg;base64,${base64Image}`],
+        similar_images: false,
+      }),
+    }
+  );
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Plant.id error ${res.status}: ${text.slice(0, 200)}`);
+    throw new Error(`crop.health error ${res.status}: ${text.slice(0, 200)}`);
   }
   return res.json();
 }
 
-function summarizeDiagnosis(plantIdJson) {
-  const suggestion = plantIdJson?.suggestions?.[0];
-  const plantName = suggestion
-    ? `${suggestion.plant_name}${
-        suggestion.plant_details?.common_names?.length
-          ? ` (${suggestion.plant_details.common_names[0]})`
+function summarizeDiagnosis(json) {
+  const crop = json?.result?.crop?.suggestions?.[0];
+  const plantName = crop
+    ? `${crop.name}${
+        crop.scientific_name && crop.scientific_name !== crop.name
+          ? ` (${crop.scientific_name})`
           : ""
       }`
     : "Unknown plant";
-  const probability = suggestion
-    ? Math.round((suggestion.probability || 0) * 100)
-    : 0;
 
-  const disease = plantIdJson?.health_assessment?.diseases?.[0];
+  const disease = json?.result?.disease?.suggestions?.[0];
   const diseaseText = disease
     ? `${disease.name} (${Math.round((disease.probability || 0) * 100)}% confidence)`
     : "No visible disease detected";
 
-  return { plantName, probability, diseaseText };
+  return { plantName, diseaseText };
 }
 
 async function remedyWithGemini({ plantName, diseaseText }) {
@@ -104,7 +105,6 @@ export async function POST(request) {
 
     let base64;
     if (imageDataUrl && imageDataUrl.startsWith("data:image/jpeg;base64,")) {
-      // Plan B: base64 payload came straight from RTDB — no fetch needed
       base64 = imageDataUrl.slice("data:image/jpeg;base64,".length);
     } else if (imageUrl && /^https:\/\//.test(imageUrl)) {
       base64 = await fetchImageAsBase64(imageUrl);
@@ -118,16 +118,25 @@ export async function POST(request) {
       );
     }
 
-    const plantIdJson = await identifyWithPlantId(base64);
-    const { plantName, probability, diseaseText } =
-      summarizeDiagnosis(plantIdJson);
-    const remedy = await remedyWithGemini({ plantName, diseaseText });
+    const cropJson = await identifyWithCropHealth(base64);
+    const { plantName, diseaseText } = summarizeDiagnosis(cropJson);
+
+    let remedy;
+    try {
+      remedy = await remedyWithGemini({ plantName, diseaseText });
+    } catch (gemErr) {
+      // Gemini failure should not kill the whole diagnosis
+      console.error("Gemini fallback:", gemErr.message);
+      remedy =
+        `Diagnosis: ${diseaseText}. ` +
+        `General guidance: remove badly affected leaves, spray diluted ` +
+        `neem-oil weekly at dusk, avoid overhead watering, and re-scan in 3 days.`;
+    }
 
     return NextResponse.json(
       {
         success: true,
         plant_identified: plantName,
-        identification_confidence: probability,
         health_diagnosis: diseaseText,
         gemini_remedy: remedy,
       },
