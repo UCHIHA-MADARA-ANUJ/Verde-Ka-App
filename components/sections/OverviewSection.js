@@ -14,6 +14,11 @@ import {
 } from "lucide-react";
 import MoistureGauge from "@/components/MoistureGauge";
 import ReservoirCylinder from "@/components/ReservoirCylinder";
+import AnimatedNumber from "@/components/AnimatedNumber";
+
+function growLightLabel(on) {
+  return on ? "LIGHT · UV ON" : "LIGHT LEVEL";
+}
 
 const stagger = {
   hidden: { opacity: 0, y: 16 },
@@ -24,22 +29,32 @@ const stagger = {
   }),
 };
 
-function StatCard({ i, icon: Icon, label, value, unit, accent, sub }) {
+function StatCard({ i, icon: Icon, label, value, unit, accent, sub, decimals = 0, raw }) {
   return (
     <motion.div
       variants={stagger}
       initial="hidden"
       animate="show"
       custom={i}
-      className="crt relative rounded-lg border border-verde-border bg-verde-card p-4 transition-all duration-200 hover:shadow-glow"
+      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+      className="crt sheen relative rounded-xl border border-verde-border bg-verde-card p-4 transition-all duration-300 hover:shadow-glow"
     >
       <div className="flex items-center justify-between">
         <p className="text-[9px] tracking-widest text-verde-muted">{label}</p>
-        <Icon size={14} style={{ color: accent }} />
+        <motion.span
+          animate={{ scale: [1, 1.15, 1] }}
+          transition={{ duration: 2.4, repeat: Infinity, delay: i * 0.4 }}
+        >
+          <Icon size={14} style={{ color: accent }} />
+        </motion.span>
       </div>
-      <p className="mt-2 text-2xl text-verde-text">
-        {value}
-        <span className="ml-1 text-xs text-verde-muted">{unit}</span>
+      <p className="mt-2 font-display text-2xl font-bold text-verde-text">
+        {raw != null ? (
+          raw
+        ) : (
+          <AnimatedNumber value={value} decimals={decimals} />
+        )}
+        <span className="ml-1 text-xs font-normal text-verde-muted">{unit}</span>
       </p>
       {sub && <p className="mt-1 text-[9px] text-verde-dim">{sub}</p>}
     </motion.div>
@@ -68,7 +83,8 @@ export default function OverviewSection({ sensors, controls, online, scan }) {
           i={0}
           icon={Thermometer}
           label="AMBIENT TEMP"
-          value={Number(sensors.temperature ?? 0).toFixed(1)}
+          value={sensors.temperature ?? 0}
+          decimals={1}
           unit="°C"
           accent="#f97316"
           sub="DHT22 · GPIO 4"
@@ -77,7 +93,8 @@ export default function OverviewSection({ sensors, controls, online, scan }) {
           i={1}
           icon={Droplet}
           label="AIR HUMIDITY"
-          value={Number(sensors.humidity ?? 0).toFixed(1)}
+          value={sensors.humidity ?? 0}
+          decimals={1}
           unit="%"
           accent="#38bdf8"
           sub="DHT22 · GPIO 4"
@@ -85,7 +102,7 @@ export default function OverviewSection({ sensors, controls, online, scan }) {
         <StatCard
           i={2}
           icon={SunMedium}
-          label="LIGHT LEVEL"
+          label={growLightLabel(lightOn)}
           value={sensors.lux ?? 0}
           unit="LUX"
           accent={lightOn ? "#a855f7" : "#eab308"}
@@ -95,7 +112,7 @@ export default function OverviewSection({ sensors, controls, online, scan }) {
           i={3}
           icon={Waves}
           label="MODE"
-          value={manual ? "MANUAL" : "AUTO"}
+          raw={manual ? "MANUAL" : "AUTO"}
           unit=""
           accent="#22c55e"
           sub={manual ? "OPERATOR IN COMMAND" : "SMART BOTANIST ACTIVE"}

@@ -56,10 +56,11 @@ export default function Toasts({ sensors, controls }) {
         {toasts.map((t) => (
           <motion.div
             key={t.id}
-            initial={{ opacity: 0, x: 60 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 60 }}
-            className={`rounded border px-4 py-2.5 text-[11px] shadow-glow-sm ${
+            initial={{ opacity: 0, x: 80, scale: 0.85 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 80, scale: 0.85 }}
+            transition={{ type: "spring", stiffness: 320, damping: 24 }}
+            className={`rounded-lg border px-4 py-2.5 text-[11px] shadow-glow-sm backdrop-blur ${
               t.tone === "green"
                 ? "border-verde-green/50 bg-verde-panel text-verde-green"
                 : "border-verde-water/50 bg-verde-panel text-verde-water"

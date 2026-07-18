@@ -27,11 +27,27 @@ export default function Sidebar({ active, onSelect, online }) {
       {/* ── Desktop rail ── */}
       <aside className="fixed left-0 top-0 z-40 hidden h-screen w-56 flex-col border-r border-verde-border bg-verde-panel/80 backdrop-blur lg:flex">
         <div className="flex items-center gap-3 border-b border-verde-border px-5 py-5">
-          <div className="rounded border border-verde-green/40 p-2 text-verde-green shadow-glow-sm">
-            <Sprout size={18} />
-          </div>
+          <motion.div
+            animate={{
+              boxShadow: [
+                "0 0 8px rgba(34,197,94,0.25)",
+                "0 0 18px rgba(34,197,94,0.6)",
+                "0 0 8px rgba(34,197,94,0.25)",
+              ],
+            }}
+            transition={{ duration: 2.5, repeat: Infinity }}
+            className="rounded-lg border border-verde-green/40 p-2 text-verde-green"
+          >
+            <motion.span
+              animate={{ rotate: [0, 8, -8, 0] }}
+              transition={{ duration: 4, repeat: Infinity }}
+              className="block"
+            >
+              <Sprout size={18} />
+            </motion.span>
+          </motion.div>
           <div>
-            <p className="text-sm tracking-widest text-verde-green text-glow">
+            <p className="font-display text-sm font-bold tracking-widest text-verde-green text-glow">
               VERDE
             </p>
             <p className="text-[8px] tracking-[0.3em] text-verde-muted">

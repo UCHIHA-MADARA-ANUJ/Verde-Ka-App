@@ -99,23 +99,35 @@ export default function AIDeck({ controls, requestCapture, scan, online }) {
   };
 
   return (
-    <div className="crt relative rounded-lg border border-verde-border bg-verde-card p-5 transition-shadow hover:shadow-glow">
+    <div className="crt sheen relative rounded-xl border border-verde-border bg-verde-card p-5 transition-all duration-300 hover:shadow-glow">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <p className="text-[10px] tracking-widest text-verde-muted">
-          ▓ AI DIAGNOSTIC DECK · PLANT.ID + GEMINI 2.0 FLASH
+          ▓ AI DIAGNOSTIC DECK · CROP.HEALTH + GEMINI 2.5 FLASH
         </p>
         <motion.button
-          whileTap={{ scale: 0.96 }}
+          whileTap={{ scale: 0.94 }}
+          whileHover={!scanning && online ? { scale: 1.03 } : {}}
           onClick={handleScan}
           disabled={scanning || !online}
-          className={`flex items-center gap-2 rounded border px-4 py-2 text-xs transition-all duration-200 ${
+          className={`relative flex items-center gap-2 overflow-hidden rounded-lg border px-5 py-2.5 text-xs tracking-wider transition-all duration-200 ${
             scanning
               ? "cursor-wait border-verde-green/40 text-verde-dim"
               : !online
               ? "cursor-not-allowed border-verde-border text-verde-muted opacity-50"
-              : "border-verde-green bg-verde-green/10 text-verde-green hover:bg-verde-green/20 hover:shadow-glow"
+              : "border-verde-green bg-verde-green/10 text-verde-green hover:bg-verde-green/20 hover:shadow-glow-lg"
           }`}
         >
+          {!scanning && online && (
+            <motion.span
+              className="pointer-events-none absolute inset-y-0 w-1/3"
+              style={{
+                background:
+                  "linear-gradient(100deg, transparent, rgba(34,197,94,0.3), transparent)",
+              }}
+              animate={{ left: ["-40%", "130%"] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            />
+          )}
           {scanning ? (
             <>
               <Loader2 size={14} className="animate-spin" />
@@ -145,7 +157,32 @@ export default function AIDeck({ controls, requestCapture, scan, online }) {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Foliage viewport */}
-        <div className="relative flex min-h-[240px] items-center justify-center overflow-hidden rounded border border-verde-border bg-verde-panel">
+        <div className="relative flex min-h-[260px] items-center justify-center overflow-hidden rounded-lg border border-verde-border bg-verde-panel">
+          {/* Radar scanning overlay while capturing */}
+          <AnimatePresence>
+            {scanning && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 z-10 flex items-center justify-center bg-verde-bg/70 backdrop-blur-[2px]"
+              >
+                <div className="relative h-36 w-36">
+                  <div className="radar-sweep absolute inset-0 rounded-full" />
+                  <div className="absolute inset-0 rounded-full border border-verde-green/40" />
+                  <div className="absolute inset-[22%] rounded-full border border-verde-green/30" />
+                  <div className="absolute inset-[44%] rounded-full border border-verde-green/20" />
+                  <motion.p
+                    animate={{ opacity: [1, 0.35, 1] }}
+                    transition={{ duration: 1.2, repeat: Infinity }}
+                    className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] tracking-widest text-verde-green"
+                  >
+                    ACQUIRING FOLIAGE…
+                  </motion.p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           {scan?.imageUrl || scan?.imageDataUrl ? (
             <>
               <img

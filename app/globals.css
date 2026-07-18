@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700;900&display=swap");
 
 :root {
   color-scheme: dark;
@@ -13,9 +13,14 @@ body {
   background: #0c0c0c;
   color: #d1fae5;
   font-family: "Share Tech Mono", "Courier Prime", ui-monospace, monospace;
+  overflow-x: hidden;
 }
 
-/* Thin green scrollbars for the terminal aesthetic */
+.font-display {
+  font-family: "Orbitron", "Share Tech Mono", monospace;
+}
+
+/* ── Scrollbars ── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -31,7 +36,7 @@ body {
   background: #22c55e;
 }
 
-/* Range slider — glowing green thumb */
+/* ── Range slider — glowing green thumb ── */
 input[type="range"].verde-slider {
   -webkit-appearance: none;
   appearance: none;
@@ -50,25 +55,30 @@ input[type="range"].verde-slider {
 input[type="range"].verde-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: #22c55e;
   cursor: pointer;
-  box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.9);
   border: 2px solid #0c0c0c;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+input[type="range"].verde-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+  box-shadow: 0 0 22px rgba(34, 197, 94, 1);
 }
 input[type="range"].verde-slider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: #22c55e;
   cursor: pointer;
-  box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.9);
   border: 2px solid #0c0c0c;
 }
 
-/* Subtle CRT scanline overlay for terminal panels */
+/* ── CRT scanline overlay ── */
 .crt::after {
   content: "";
   pointer-events: none;
@@ -76,8 +86,8 @@ input[type="range"].verde-slider::-moz-range-thumb {
   inset: 0;
   background: repeating-linear-gradient(
     0deg,
-    rgba(34, 197, 94, 0.025) 0px,
-    rgba(34, 197, 94, 0.025) 1px,
+    rgba(34, 197, 94, 0.02) 0px,
+    rgba(34, 197, 94, 0.02) 1px,
     transparent 1px,
     transparent 3px
   );
@@ -86,4 +96,178 @@ input[type="range"].verde-slider::-moz-range-thumb {
 
 .text-glow {
   text-shadow: 0 0 10px rgba(34, 197, 94, 0.55);
+}
+.text-glow-strong {
+  text-shadow: 0 0 8px rgba(34, 197, 94, 0.9), 0 0 30px rgba(34, 197, 94, 0.5);
+}
+
+/* ── Card sheen sweep on hover ── */
+.sheen {
+  position: relative;
+  overflow: hidden;
+}
+.sheen::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(34, 197, 94, 0.08) 50%,
+    transparent 80%
+  );
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.sheen:hover::before {
+  left: 120%;
+}
+
+/* ── Animated border glow for hero cards ── */
+@keyframes border-pulse {
+  0%,
+  100% {
+    border-color: rgba(34, 197, 94, 0.25);
+  }
+  50% {
+    border-color: rgba(34, 197, 94, 0.6);
+  }
+}
+.border-breathe {
+  animation: border-pulse 3s ease-in-out infinite;
+}
+
+/* ── Liquid wave surface (reservoir) ── */
+@keyframes wave-x {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+.wave {
+  animation: wave-x 3.2s linear infinite;
+}
+.wave2 {
+  animation: wave-x 5s linear infinite reverse;
+  opacity: 0.5;
+}
+
+/* ── Rising bubbles ── */
+@keyframes bubble-rise {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-120px) translateX(var(--bx, 4px));
+    opacity: 0;
+  }
+}
+.bubble {
+  animation: bubble-rise var(--bd, 3s) ease-in infinite;
+  animation-delay: var(--bdelay, 0s);
+}
+
+/* ── Radar sweep conic ── */
+@keyframes radar-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.radar-sweep {
+  background: conic-gradient(
+    from 0deg,
+    rgba(34, 197, 94, 0.35),
+    transparent 60deg
+  );
+  animation: radar-spin 2.4s linear infinite;
+}
+
+/* ── Glitch text ── */
+@keyframes glitch-1 {
+  0%,
+  92%,
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+  93% {
+    transform: translate(-2px, 1px);
+    opacity: 0.8;
+  }
+  95% {
+    transform: translate(2px, -1px);
+    opacity: 0.9;
+  }
+  97% {
+    transform: translate(-1px, -1px);
+  }
+}
+.glitch {
+  animation: glitch-1 4s infinite;
+}
+
+/* ── Shimmer skeleton ── */
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #131a13 25%,
+    #1c271c 50%,
+    #131a13 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+/* ── Grid floor perspective (landing) ── */
+.grid-floor {
+  background-image: linear-gradient(rgba(34, 197, 94, 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 197, 94, 0.25) 1px, transparent 1px);
+  background-size: 44px 44px;
+  transform: perspective(500px) rotateX(60deg) scale(2.2);
+  transform-origin: center 120%;
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent 70%);
+  -webkit-mask-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.7),
+    transparent 70%
+  );
+}
+
+/* ── Status ping dot ── */
+@keyframes ping-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+.ping-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: inherit;
+  animation: ping-ring 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
