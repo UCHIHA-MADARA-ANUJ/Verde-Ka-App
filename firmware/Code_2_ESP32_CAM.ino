@@ -14,15 +14,15 @@
 // -------------------------------------------------------------------------
 // 🌐 NETWORK & CLOUD CONFIGURATION
 // -------------------------------------------------------------------------
-#define WIFI_SSID "YOUR_WIFI_HOTSPOT_NAME"       // Enter your phone hotspot name
-#define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"   // Enter your hotspot password
-#define FIREBASE_HOST "YOUR_PROJECT_ID.firebaseio.com" // Enter your Firebase RTDB URL (without http:// or https://)
-#define FIREBASE_AUTH "YOUR_DATABASE_SECRET"   // Enter your Firebase Database Secret Key
+#define WIFI_SSID "AARAV_HOTSPOT_NAME"       // <<< AARAV: put your phone hotspot name
+#define WIFI_PASSWORD "AARAV_HOTSPOT_PASSWORD"   // <<< AARAV: put your hotspot password
+#define FIREBASE_HOST "verde-tech-haha-default-rtdb.asia-southeast1.firebasedatabase.app" // READY — do not change
+#define FIREBASE_AUTH "v7IcV45UuyozAhKaWyHBl4DvmNVoKjzBf1sh2tyl"   // READY — do not change
 
 // Next.js API route that receives raw binary JPEG data
-#define UPLOAD_URL "https://verde-tech-proj.vercel.app/api/upload-photo"
+#define UPLOAD_URL "https://verde-ka-app.vercel.app/api/upload-photo"  // <<< CHECK: must match your real Vercel domain!
 // Must match CAM_UPLOAD_API_KEY set in Vercel env vars (x-api-key guard)
-#define UPLOAD_API_KEY "YOUR_SECURE_CAM_KEY"
+#define UPLOAD_API_KEY "119a08a6c901ef59e49fcbe77e4bf1c105467a9c69f17a0f" // READY — matches Vercel CAM_UPLOAD_API_KEY
 
 // -------------------------------------------------------------------------
 // 🔌 AI-THINKER ESP32-CAM CAMERA PINOUT CONFIGURATION

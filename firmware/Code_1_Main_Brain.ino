@@ -11,10 +11,10 @@
 // -------------------------------------------------------------------------
 // 🌐 NETWORK & CLOUD CONFIGURATION
 // -------------------------------------------------------------------------
-#define WIFI_SSID "YOUR_WIFI_HOTSPOT_NAME"       // Enter your phone hotspot name
-#define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"   // Enter your hotspot password
-#define FIREBASE_HOST "YOUR_PROJECT_ID.firebaseio.com" // Enter your Firebase RTDB URL (without http:// or https://)
-#define FIREBASE_AUTH "YOUR_DATABASE_SECRET"   // Enter your Firebase Database Secret Key
+#define WIFI_SSID "AARAV_HOTSPOT_NAME"       // <<< AARAV: put your phone hotspot name
+#define WIFI_PASSWORD "AARAV_HOTSPOT_PASSWORD"   // <<< AARAV: put your hotspot password
+#define FIREBASE_HOST "verde-tech-haha-default-rtdb.asia-southeast1.firebasedatabase.app" // READY — do not change
+#define FIREBASE_AUTH "v7IcV45UuyozAhKaWyHBl4DvmNVoKjzBf1sh2tyl"   // READY — do not change
 
 // -------------------------------------------------------------------------
 // 🔌 G-V-S HARDWARE PIN MAPPING
