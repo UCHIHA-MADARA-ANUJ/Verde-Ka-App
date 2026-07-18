@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/weather-sync",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cleanup-storage",
+      "schedule": "30 20 * * *"
+    }
+  ]
+}

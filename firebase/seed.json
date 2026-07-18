@@ -1,0 +1,35 @@
+{
+  "sensors": {
+    "moisture": 0,
+    "temperature": 0,
+    "humidity": 0,
+    "lux": 0,
+    "tank_level": 0,
+    "last_updated": 0
+  },
+  "controls": {
+    "manual_mode": false,
+    "pump_state": false,
+    "grow_light_state": false,
+    "moisture_threshold": 40,
+    "weather_override": 0,
+    "capture_photo": false
+  },
+  "historical_logs": {
+    "moisture_log": {
+      "0": 0
+    }
+  },
+  "latest_scan": {
+    "imageUrl": "",
+    "captured_at": 0,
+    "status": "none"
+  },
+  "weather": {
+    "condition": "Clear",
+    "description": "awaiting first sync",
+    "temp": 0,
+    "city": "Delhi",
+    "synced_at": 0
+  }
+}

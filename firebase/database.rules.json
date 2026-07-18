@@ -1,0 +1,22 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "sensors": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "controls": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "historical_logs": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "latest_scan": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    }
+  }
+}

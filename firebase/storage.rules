@@ -1,0 +1,11 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /scans/{allPaths=**} {
+      // Leaf scans are publicly readable so the dashboard can render URLs
+      allow read: if true;
+      // Only authenticated users or the backend Admin SDK can write
+      allow write: if request.auth != null;
+    }
+  }
+}
